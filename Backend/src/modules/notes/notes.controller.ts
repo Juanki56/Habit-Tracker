@@ -54,3 +54,21 @@ export async function unlinkHabit(req: Request, res: Response, next: NextFunctio
     res.status(204).send();
   } catch (err) { next(err); }
 }
+
+export async function linkResource(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = getRequiredParam(req, "id");
+    const resourceId = getRequiredParam(req, "resourceId");
+    await notesService.linkToResource(req.supabase, id, resourceId);
+    res.status(204).send();
+  } catch (err) { next(err); }
+}
+
+export async function unlinkResource(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = getRequiredParam(req, "id");
+    const resourceId = getRequiredParam(req, "resourceId");
+    await notesService.unlinkFromResource(req.supabase, id, resourceId);
+    res.status(204).send();
+  } catch (err) { next(err); }
+}

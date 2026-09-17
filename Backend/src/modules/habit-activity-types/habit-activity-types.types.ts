@@ -5,5 +5,6 @@ export interface HabitActivityTypeAssignment {
     name: string;
     icon: string | null;
     description: string | null;
+    user_id: string | null;
   };
 }

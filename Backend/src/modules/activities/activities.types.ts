@@ -29,3 +29,17 @@ export interface CreateActivityInput {
   unit?: string;
   field_values?: Record<string, unknown>;
 }
+
+// No incluye activity_type_id ni local_date a propósito: cambiar el tipo
+// invalidaría los field_values ya guardados, y mover la fecha implicaría
+// reasignar check_in_id (compartido con otras actividades del mismo día) —
+// ninguno de los dos es un simple UPDATE de columna.
+export interface UpdateActivityInput {
+  title?: string;
+  description?: string;
+  resource_id?: string | null;
+  duration_seconds?: number | null;
+  quantity?: number | null;
+  unit?: string | null;
+  field_values?: Record<string, unknown>;
+}

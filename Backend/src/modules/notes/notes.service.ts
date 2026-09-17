@@ -106,3 +106,19 @@ export async function unlinkFromHabit(supabase: SupabaseClient, noteId: string, 
   const { error } = await supabase.from("note_habits").delete().eq("note_id", noteId).eq("habit_id", habitId);
   if (error) throw new HttpError(error.message);
 }
+
+// Antes solo se podían vincular recursos al CREAR la nota — si no tenías el
+// recurso todavía en ese momento, quedaba imposible de conectar después.
+export async function linkToResource(supabase: SupabaseClient, noteId: string, resourceId: string) {
+  const { error } = await supabase.from("note_resources").upsert({ note_id: noteId, resource_id: resourceId });
+  if (error) throw new HttpError(error.message);
+}
+
+export async function unlinkFromResource(supabase: SupabaseClient, noteId: string, resourceId: string) {
+  const { error } = await supabase
+    .from("note_resources")
+    .delete()
+    .eq("note_id", noteId)
+    .eq("resource_id", resourceId);
+  if (error) throw new HttpError(error.message);
+}

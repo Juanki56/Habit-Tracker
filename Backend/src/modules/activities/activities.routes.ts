@@ -8,6 +8,7 @@ const router = Router({ mergeParams: true });
 router.get("/", activitiesController.index);
 router.post("/", activitiesController.create);
 router.get("/:activityId", activitiesController.show);
+router.patch("/:activityId", activitiesController.update);
 router.delete("/:activityId", activitiesController.remove);
 router.use("/:activityId/vocabulary", activityVocabularyRouter);
 

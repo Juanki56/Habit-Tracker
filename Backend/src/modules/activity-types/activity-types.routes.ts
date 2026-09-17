@@ -7,5 +7,7 @@ router.use(requireAuth);
 
 router.get("/", activityTypesController.index);
 router.post("/", activityTypesController.create);
+router.patch("/:id", activityTypesController.update);
+router.get("/:id/fields", activityTypesController.fields);
 
 export default router;

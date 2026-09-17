@@ -5,7 +5,7 @@ import { HabitActivityTypeAssignment } from "./habit-activity-types.types.js";
 export async function listForHabit(supabase: SupabaseClient, habitId: string) {
   const { data, error } = await supabase
     .from("habit_activity_types")
-    .select("activity_type_id, activity_types(id, name, icon, description)")
+    .select("activity_type_id, activity_types(id, name, icon, description, user_id)")
     .eq("habit_id", habitId);
 
   if (error) throw new HttpError(error.message);
@@ -18,7 +18,7 @@ export async function attach(supabase: SupabaseClient, habitId: string, activity
   const { data, error } = await supabase
     .from("habit_activity_types")
     .insert({ habit_id: habitId, activity_type_id: activityTypeId })
-    .select("activity_type_id, activity_types(id, name, icon, description)")
+    .select("activity_type_id, activity_types(id, name, icon, description, user_id)")
     .single();
 
   // El propio trigger validate_habit_activity_type_owner ya rechaza tipos de otro usuario.

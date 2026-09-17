@@ -29,6 +29,13 @@ export async function show(req: Request, res: Response, next: NextFunction) {
   } catch (err) { next(err); }
 }
 
+export async function update(req: Request, res: Response, next: NextFunction) {
+  try {
+    const activityId = getRequiredParam(req, "activityId");
+    res.json(await activitiesService.updateActivity(req.supabase, activityId, req.body));
+  } catch (err) { next(err); }
+}
+
 export async function remove(req: Request, res: Response, next: NextFunction) {
   try {
     const activityId = getRequiredParam(req, "activityId");

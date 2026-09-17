@@ -26,6 +26,22 @@ export async function createCategory(
   return data as HabitCategory;
 }
 
+export async function updateCategory(
+  supabase: SupabaseClient,
+  id: string,
+  input: { name?: string; description?: string; icon?: string }
+) {
+  const { data, error } = await supabase
+    .from("habit_categories")
+    .update(input)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw new HttpError("No se pudo actualizar — puede que sea una categoría global, no editable");
+  return data as HabitCategory;
+}
+
 export async function deleteCategory(supabase: SupabaseClient, id: string) {
   const { error } = await supabase.from("habit_categories").delete().eq("id", id);
   if (error) throw new HttpError(error.message);

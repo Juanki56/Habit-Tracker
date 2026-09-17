@@ -7,6 +7,7 @@ router.use(requireAuth);
 
 router.get("/", habitCategoriesController.index);
 router.post("/", habitCategoriesController.create);
+router.patch("/:id", habitCategoriesController.update);
 router.delete("/:id", habitCategoriesController.remove);
 
 export default router;

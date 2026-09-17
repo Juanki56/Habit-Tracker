@@ -2,7 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { HttpError } from "../../utils/request.js";
 import * as checkInsService from "../check-ins/check-ins.service.js";
 import { buildFieldValueRows, flattenFieldValues, getFieldDefinitions } from "./field-values.util.js";
-import { Activity, CreateActivityInput } from "./activities.types.js";
+import { Activity, CreateActivityInput, UpdateActivityInput } from "./activities.types.js";
 
 function todayUTC(): string {
   return new Date().toISOString().slice(0, 10);
@@ -16,15 +16,17 @@ const SELECT_WITH_RELATIONS = `
   activity_field_values (
     text_value, number_value, boolean_value, date_value, datetime_value, json_value,
     activity_field_definitions ( key )
-  )
+  ),
+  resources ( title, resource_type )
 `;
 
 function shapeRow(row: any) {
-  const { habit_check_ins, activity_field_values, ...rest } = row;
+  const { habit_check_ins, activity_field_values, resources, ...rest } = row;
   return {
     ...rest,
     local_date: habit_check_ins?.local_date ?? null,
     field_values: flattenFieldValues(activity_field_values ?? []),
+    resource: resources ? { title: resources.title, resource_type: resources.resource_type } : null,
   };
 }
 
@@ -101,6 +103,45 @@ export async function getActivityById(supabase: SupabaseClient, id: string) {
   const { data, error } = await supabase.from("activities").select(SELECT_WITH_RELATIONS).eq("id", id).single();
   if (error) throw new HttpError("Actividad no encontrada", 404);
   return shapeRow(data);
+}
+
+export async function updateActivity(
+  supabase: SupabaseClient,
+  id: string,
+  input: UpdateActivityInput
+) {
+  const { field_values, ...columns } = input;
+
+  if (Object.keys(columns).length > 0) {
+    const { error } = await supabase.from("activities").update(columns).eq("id", id);
+    if (error) throw new HttpError(error.message);
+  }
+
+  if (field_values) {
+    const { data: activity, error: fetchError } = await supabase
+      .from("activities")
+      .select("activity_type_id")
+      .eq("id", id)
+      .single();
+    if (fetchError) throw new HttpError("Actividad no encontrada", 404);
+
+    // Reemplaza todos los field_values — más simple y predecible que intentar
+    // diffear cuáles cambiaron, y de todas formas el formulario siempre manda
+    // el set completo (igual que al crear).
+    const { error: deleteError } = await supabase.from("activity_field_values").delete().eq("activity_id", id);
+    if (deleteError) throw new HttpError(deleteError.message);
+
+    if (Object.keys(field_values).length > 0) {
+      const definitions = await getFieldDefinitions(supabase, (activity as { activity_type_id: string }).activity_type_id);
+      const rows = buildFieldValueRows(id, field_values, definitions);
+      if (rows.length > 0) {
+        const { error: insertError } = await supabase.from("activity_field_values").insert(rows);
+        if (insertError) throw new HttpError(insertError.message);
+      }
+    }
+  }
+
+  return getActivityById(supabase, id);
 }
 
 export async function deleteActivity(supabase: SupabaseClient, id: string) {

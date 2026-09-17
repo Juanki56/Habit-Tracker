@@ -13,3 +13,9 @@ export interface CreateActivityTypeInput {
   description?: string;
   icon?: string;
 }
+
+export interface UpdateActivityTypeInput {
+  name?: string;
+  description?: string;
+  icon?: string;
+}

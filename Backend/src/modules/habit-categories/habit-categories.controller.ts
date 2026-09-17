@@ -15,6 +15,13 @@ export async function create(req: Request, res: Response, next: NextFunction) {
   } catch (err) { next(err); }
 }
 
+export async function update(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = getRequiredParam(req, "id");
+    res.json(await habitCategoriesService.updateCategory(req.supabase, id, req.body));
+  } catch (err) { next(err); }
+}
+
 export async function remove(req: Request, res: Response, next: NextFunction) {
   try {
     const id = getRequiredParam(req, "id");

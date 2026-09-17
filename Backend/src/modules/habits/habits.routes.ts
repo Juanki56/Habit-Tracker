@@ -8,6 +8,7 @@ const router = Router();
 router.use(requireAuth);
 import habitDashboardRouter from "../dashboard/habit-dashboard.routes.js";
 import habitSchedulesRouter from "../habit-schedules/habit-schedules.routes.js";
+import habitMetricsRouter from "../habit-metrics/habit-metrics.routes.js";
 
 
 router.get("/", habitsController.index);
@@ -20,4 +21,5 @@ router.use("/:id/activity-types", habitActivityTypesRouter);
 router.use("/:id/activities", activitiesRouter);
 router.use("/:id/dashboard", habitDashboardRouter);
 router.use("/:id/schedules", habitSchedulesRouter);
+router.use("/:id/metrics", habitMetricsRouter);
 export default router;
